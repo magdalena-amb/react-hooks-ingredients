@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 
 import Card from "../UI/Card";
 import "./Search.css";
@@ -6,33 +6,42 @@ import "./Search.css";
 const Search = React.memo((props) => {
   const { onLoadIngredients } = props;
   const [enteredFilter, setEnteredFilter] = useState("");
+  const inputRef = useRef();
 
   useEffect(() => {
-    const query =
-      enteredFilter.length === 0
-        ? ""
-        : `?orderBy="title"&equalTo="${enteredFilter}"`;
-    async function fetchData() {
-      const response = await fetch(
-        `https://react-hooks-ingredient-list-default-rtdb.europe-west1.firebasedatabase.app/ingredients.json${query}`
-      );
-      return await response.json();
-    }
+    const timer = setTimeout(() => {
+      if (enteredFilter === inputRef.current.value) {
+        const query =
+          enteredFilter.length === 0
+            ? ""
+            : `?orderBy="title"&equalTo="${enteredFilter.toLowerCase()}"`;
+        async function fetchData() {
+          const response = await fetch(
+            `https://react-hooks-ingredient-list-default-rtdb.europe-west1.firebasedatabase.app/ingredients.json${query}`
+          );
+          return await response.json();
+        }
 
-    fetchData().then((resData) => {
-      const transformedIngredients = [];
+        fetchData().then((resData) => {
+          const transformedIngredients = [];
 
-      for (let key in resData) {
-        transformedIngredients.push({
-          id: key,
-          title: resData[key].title,
-          amount: resData[key].amount,
+          for (let key in resData) {
+            transformedIngredients.push({
+              id: key,
+              title: resData[key].title,
+              amount: resData[key].amount,
+            });
+          }
+
+          onLoadIngredients(transformedIngredients);
         });
       }
+    }, 500);
 
-      onLoadIngredients(transformedIngredients);
-    });
-  }, [enteredFilter, onLoadIngredients]);
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [enteredFilter, onLoadIngredients, inputRef]);
 
   function filterChangeHandler(event) {
     setEnteredFilter(event.target.value);
@@ -45,6 +54,7 @@ const Search = React.memo((props) => {
           <label>Filter by Title</label>
           <input
             type="text"
+            ref={inputRef}
             value={enteredFilter}
             onChange={filterChangeHandler}
           />
