@@ -8,10 +8,24 @@ function Ingredients() {
   const [userIngredients, setUserIngredients] = useState([]);
 
   function submitHandler(ingr) {
-    setUserIngredients((prevIngr) => [
-      ...prevIngr,
-      { ...ingr, id: Math.random().toString() },
-    ]);
+    fetch(
+      "https://react-hooks-ingredient-list-default-rtdb.europe-west1.firebasedatabase.app/ingredients.json",
+      {
+        method: "POST",
+        body: JSON.stringify(ingr),
+        headers: { "Content-Type": "application/json" },
+      }
+    )
+      .then((res) => {
+        return res.json();
+      })
+      .then((resData) => {
+        console.log(resData);
+        setUserIngredients((prevIngr) => [
+          ...prevIngr,
+          { ...ingr, id: resData.name },
+        ]);
+      });
   }
 
   return (
