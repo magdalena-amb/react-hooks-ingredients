@@ -31,6 +31,19 @@ function Ingredients() {
       });
   }
 
+  function removeIngredientHandler(ingredientId) {
+    fetch(
+      `https://react-hooks-ingredient-list-default-rtdb.europe-west1.firebasedatabase.app/ingredients/${ingredientId}.json`,
+      {
+        method: "DELETE",
+      }
+    ).then((response) => {
+      setUserIngredients((prevIngr) => {
+        prevIngr.filter((ingr) => ingr.id !== ingredientId);
+      });
+    });
+  }
+
   return (
     <div className="App">
       <IngredientForm onFormSubmit={submitHandler} />
@@ -40,7 +53,7 @@ function Ingredients() {
         {userIngredients.length > 0 && (
           <IngredientList
             ingredients={userIngredients}
-            onRemoveItem={() => {}}
+            onRemoveItem={removeIngredientHandler}
           />
         )}
       </section>
