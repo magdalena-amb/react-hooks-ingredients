@@ -15,26 +15,23 @@ const Search = React.memo((props) => {
           enteredFilter.length === 0
             ? ""
             : `?orderBy="title"&equalTo="${enteredFilter.toLowerCase()}"`;
-        async function fetchData() {
-          const response = await fetch(
-            `https://react-hooks-ingredient-list-default-rtdb.europe-west1.firebasedatabase.app/ingredients.json${query}`
-          );
-          return await response.json();
-        }
 
-        fetchData().then((resData) => {
-          const transformedIngredients = [];
+        fetch(
+          `https://react-hooks-ingredient-list-default-rtdb.europe-west1.firebasedatabase.app/ingredients.json${query}`
+        )
+          .then((response) => response.json())
+          .then((resData) => {
+            const transformedIngredients = [];
 
-          for (let key in resData) {
-            transformedIngredients.push({
-              id: key,
-              title: resData[key].title,
-              amount: resData[key].amount,
-            });
-          }
-
-          onLoadIngredients(transformedIngredients);
-        });
+            for (let key in resData) {
+              transformedIngredients.push({
+                id: key,
+                title: resData[key].title,
+                amount: resData[key].amount,
+              });
+            }
+            onLoadIngredients(transformedIngredients);
+          });
       }
     }, 500);
 
