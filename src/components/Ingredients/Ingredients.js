@@ -2,11 +2,13 @@ import React, { useState, useCallback } from "react";
 
 import IngredientForm from "./IngredientForm";
 import IngredientList from "./IngredientList";
+import ErrorModal from "../UI/ErrorModal";
 import Search from "./Search";
 
 function Ingredients() {
   const [userIngredients, setUserIngredients] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState();
 
   const filteredIngredientsHandler = useCallback((filteredIngredients) => {
     setUserIngredients(filteredIngredients);
@@ -42,16 +44,27 @@ function Ingredients() {
       {
         method: "DELETE",
       }
-    ).then((res) => {
-      setIsLoading(false);
-      setUserIngredients((prevIngr) => {
-        prevIngr.filter((ingr) => ingr.id !== ingredientId);
+    )
+      .then((res) => {
+        setIsLoading(false);
+        setUserIngredients((prevIngr) => {
+          prevIngr.filter((ingr) => ingr.id !== ingredientId);
+        });
+        // console.log(userIngredients);
+      })
+      .catch((error) => {
+        setError(error.message);
       });
-    });
+  }
+
+  function clearError() {
+    setError(null);
+    setIsLoading(false);
   }
 
   return (
     <div className="App">
+      {error && <ErrorModal onClose={clearError}>{error}</ErrorModal>}
       <IngredientForm onFormSubmit={submitHandler} loading={isLoading} />
 
       <section>
