@@ -1,4 +1,4 @@
-##[Project Demo](https://react-hooks-ingredient-list.web.app)
+## [Project Demo](https://react-hooks-ingredient-list.web.app)
 
 ___
 
