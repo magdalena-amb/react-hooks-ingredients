@@ -1,4 +1,4 @@
-import React, { useEffect, useReducer, useState, useCallback } from "react";
+import React, { useReducer, useCallback } from "react";
 
 import IngredientForm from "./IngredientForm";
 import IngredientList from "./IngredientList";
@@ -67,7 +67,7 @@ const Ingredients = () => {
     dispatchIngredients({ type: "SET", ingredients: filteredIngredients });
   }, []);
 
-  function submitHandler(ingr) {
+  const addIngredientHandler = useCallback((ingr) => {
     dispatchHttp({ type: "SEND" });
     fetch(
       "https://react-hooks-ingredient-list-default-rtdb.europe-west1.firebasedatabase.app/ingredients.json",
@@ -91,9 +91,9 @@ const Ingredients = () => {
       .catch((error) => {
         dispatchHttp({ type: "ERROR", errorData: error.message });
       });
-  }
+  }, []);
 
-  function removeIngredientHandler(ingredientId) {
+  const removeIngredientHandler = useCallback((ingredientId) => {
     dispatchHttp({ type: "SEND" });
     fetch(
       `https://react-hooks-ingredient-list-default-rtdb.europe-west1.firebasedatabase.app/ingredients/${ingredientId}.json`,
@@ -108,16 +108,21 @@ const Ingredients = () => {
       .catch((error) => {
         dispatchHttp({ type: "ERROR", errorData: error.message });
       });
-  }
+  }, []);
 
-  function clearError() {
+  const clearError = useCallback(() => {
     dispatchHttp({ type: "CLEAR ERROR" });
-  }
+  }, []);
 
   return (
     <div className="App">
-      {httpState.error && <ErrorModal onClose={clearError}>{httpState.error}</ErrorModal>}
-      <IngredientForm onFormSubmit={submitHandler} loading={httpState.loading} />
+      {httpState.error && (
+        <ErrorModal onClose={clearError}>{httpState.error}</ErrorModal>
+      )}
+      <IngredientForm
+        onFormSubmit={addIngredientHandler}
+        loading={httpState.loading}
+      />
 
       <section>
         <Search onLoadIngredients={filteredIngredientsHandler} />
